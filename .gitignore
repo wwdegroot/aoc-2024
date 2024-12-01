@@ -28,3 +28,9 @@ dhat-heap.json
 # Benchmarks
 
 data/timings.json
+
+# Python stuff
+.idea/
+.venv/
+*.pyc
+
