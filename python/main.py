@@ -3,7 +3,7 @@ import time
 from pathlib import Path
 
 from puzzles import INPUTS
-from puzzles import day1
+from puzzles import day1, day2
 
 
 def read_file_contents(input_file: Path) -> str:
@@ -21,7 +21,6 @@ def print_elapsed_time(elapsed: int):
     print(f"Solved in {elapsed_time}")
 
 
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--day', type=int, default=1, help='Day')
@@ -33,12 +32,15 @@ def main():
     match args.day:
         case 1:
             day1.run(content, part=args.part)
+        case 2:
+            day2.run(content, part=args.part)
         case _:
             raise ValueError(f"Invalid day input {args.day}. Enter number 1-25")
 
     end_time = time.perf_counter_ns()
     elapsed_time = end_time - start_time
     print_elapsed_time(elapsed_time)
+
 
 if __name__ == '__main__':
     main()
