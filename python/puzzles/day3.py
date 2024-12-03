@@ -4,6 +4,7 @@ import re
 mul_pattern = re.compile(r"mul\(\d{1,3},\d{1,3}\)")
 number_pattern = re.compile(r"(\d+)")
 mul_pattern_do_dont = re.compile(r"(mul\(\d{1,3},\d{1,3}\))|(do\(\))|(don't\(\))")
+
 enabled = True
 
 
@@ -17,13 +18,14 @@ def part_one(input: str) -> int:
 
 
 def handle_patterns(pattern: tuple[str, str, str]) -> int:
-    global enabled
     nums, do, dont = pattern
+    global enabled
+
     if nums != '' and enabled:
         return multiply_numbers(nums)
     if do == 'do()':
         enabled = True
-    if dont == 'dont':
+    if dont == "don't()":
         enabled = False
     return 0
 
