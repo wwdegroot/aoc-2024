@@ -3,7 +3,7 @@ import time
 from pathlib import Path
 
 from puzzles import INPUTS
-from puzzles import day1, day2
+from puzzles import day1, day2, day3
 
 
 def read_file_contents(input_file: Path) -> str:
@@ -34,6 +34,8 @@ def main():
             day1.run(content, part=args.part)
         case 2:
             day2.run(content, part=args.part)
+        case 3:
+            day3.run(content, part=args.part)
         case _:
             raise ValueError(f"Invalid day input {args.day}. Enter number 1-25")
 
