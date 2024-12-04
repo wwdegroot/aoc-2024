@@ -10,4 +10,5 @@ INPUTS = {
     1: INPUT_ONE,
     2: INPUT_TWO,
     3: INPUT_THREE,
+    4: DATA_DIR / 'inputs' / '04.txt',
 }
