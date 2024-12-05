@@ -13,54 +13,58 @@ pub struct PageUpdate {
     numbers: Vec<i32>,
 }
 
-
-pub fn parse_input(input: &str) -> (Vec<PageOrderRule>, Vec<PageUpdate> ) {
+pub fn parse_input(input: &str) -> (Vec<PageOrderRule>, Vec<PageUpdate>) {
     let mut rules: Vec<PageOrderRule> = Vec::with_capacity(1200);
-    let mut pages: Vec<PageUpdate> = Vec::with_capacity(300); 
+    let mut pages: Vec<PageUpdate> = Vec::with_capacity(300);
     let mut rules_active: bool = true;
     for line in input.lines() {
-        if line.is_empty(){
+        if line.is_empty() {
             rules_active = false;
             continue;
-        }   
+        }
         if rules_active {
             let (a, b) = line.split_once("|").expect("Expected page rule");
             let first = a.parse::<i32>().expect("Not a number");
             let last = b.parse::<i32>().expect("Not a number");
-            rules.push(PageOrderRule{ first, last});
+            rules.push(PageOrderRule { first, last });
         } else {
-            let numbers: Vec<i32> = line.split(",").map(|n| n.parse::<i32>().expect("Expected a number here")).collect();
-            pages.push(PageUpdate{numbers});
+            let numbers: Vec<i32> = line
+                .split(",")
+                .map(|n| n.parse::<i32>().expect("Expected a number here"))
+                .collect();
+            pages.push(PageUpdate { numbers });
         }
     }
     (rules, pages)
 }
 
-
 pub fn check_pages(pages: Vec<PageUpdate>, rules: &Vec<PageOrderRule>) -> i32 {
-    pages.iter().map(|p| {
-        let mut correct: bool = true;
-        for r in rules {
-            let first_pos = p.numbers.iter().position(|&x| x == r.first);
-            let last_pos =  p.numbers.iter().position(|&x| x == r.last);
-            // rule numbers or number not found in this page, contine with other rules
-            if first_pos.is_none() || last_pos.is_none() {
-                continue
+    pages
+        .iter()
+        .map(|p| {
+            let mut correct: bool = true;
+            for r in rules {
+                let first_pos = p.numbers.iter().position(|&x| x == r.first);
+                let last_pos = p.numbers.iter().position(|&x| x == r.last);
+                // rule numbers or number not found in this page, contine with other rules
+                if first_pos.is_none() || last_pos.is_none() {
+                    continue;
+                }
+                // page failed the rule check, check next page
+                if first_pos.unwrap() > last_pos.unwrap() {
+                    correct = false;
+                    break;
+                }
             }
-            // page failed the rule check, check next page
-            if first_pos.unwrap() > last_pos.unwrap() {
-                correct = false;
-                break
+            // return middle number of page numbers
+            if correct {
+                let middle_index: usize = p.numbers.len() / 2;
+                p.numbers[middle_index]
+            } else {
+                0
             }
-        }
-        // return middle number of page numbers
-        if correct {
-            let middle_index: usize = p.numbers.len() / 2;
-            p.numbers[middle_index]
-        } else {
-            0
-        }
-    }).sum()
+        })
+        .sum()
 }
 
 pub fn part_one(input: &str) -> Option<i32> {
@@ -73,10 +77,10 @@ pub fn sort_numbers(mut numbers: Vec<i32>, rules: &Vec<PageOrderRule>) -> (bool,
     let mut sorted: bool = false;
     for r in rules {
         let first_pos = numbers.iter().position(|&x| x == r.first);
-        let last_pos =  numbers.iter().position(|&x| x == r.last);
+        let last_pos = numbers.iter().position(|&x| x == r.last);
         // rule numbers not found in this page, contine with other rules
         if first_pos.is_none() || last_pos.is_none() {
-            continue
+            continue;
         }
         // page failed the rule insert the index of the first before the last and continue
         if first_pos.unwrap() > last_pos.unwrap() {
@@ -86,33 +90,35 @@ pub fn sort_numbers(mut numbers: Vec<i32>, rules: &Vec<PageOrderRule>) -> (bool,
             numbers.remove(first_pos.unwrap());
             numbers.insert(first_pos.unwrap(), r.last);
             sorted = true;
-            break
+            break;
         }
     }
     (sorted, numbers)
 }
 
-
 pub fn fix_pages(pages: Vec<PageUpdate>, rules: &Vec<PageOrderRule>) -> Vec<Option<i32>> {
-    pages.into_iter().map(|mut p| {
-        let mut sorted = false;
-        let mut numbers: Vec<i32> = p.numbers.clone();
-        let mut middle: Option<i32> = None;
-        // keep looping till no rules cause a sort
-        let mut i: usize = 1;
-        loop {
-            (sorted, numbers) = sort_numbers(numbers, rules);
-            if !sorted{
-                // needed at least one sorting, so was a failing pageupdate
-                if i > 1 {
-                    middle = Some(numbers[numbers.len() / 2]);
+    pages
+        .into_iter()
+        .map(|mut p| {
+            let mut sorted = false;
+            let mut numbers: Vec<i32> = p.numbers.clone();
+            let mut middle: Option<i32> = None;
+            // keep looping till no rules cause a sort
+            let mut i: usize = 1;
+            loop {
+                (sorted, numbers) = sort_numbers(numbers, rules);
+                if !sorted {
+                    // needed at least one sorting, so was a failing pageupdate
+                    if i > 1 {
+                        middle = Some(numbers[numbers.len() / 2]);
+                    }
+                    break;
                 }
-                break
+                i += 1
             }
-            i += 1
-        }
-        middle
-    }).collect()
+            middle
+        })
+        .collect()
 }
 
 pub fn part_two(input: &str) -> Option<i32> {
