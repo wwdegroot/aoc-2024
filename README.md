@@ -4,6 +4,8 @@
 
 Solutions for [Advent of Code](https://adventofcode.com/) in [Rust](https://www.rust-lang.org/).
 
+Solutions for [Python with benchmarks](./python/README.md)
+
 <!--- advent_readme_stars table --->
 
 <!--- benchmarking table --->
