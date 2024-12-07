@@ -170,7 +170,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     let (equations, max_op_size) = parse_input(input);
     //let ops_map = create_ops_permutations(max_op_size, &OPERATORS);
     //let result = equations.par_iter().map(|equation| equation.solve(ops_map.get(&equation.op_space).unwrap())).sum();
-    let result = equations.iter().filter( |&e| {
+    let result = equations.par_iter().filter( |&e| {
         calculate_ops_early(&OPERATORS, e)
     }).map(|e| e.result).sum();
     Some(result)
@@ -180,7 +180,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     let (equations, max_op_size) = parse_input(input);
     //let ops_map = create_ops_permutations(max_op_size, &OPERATORS2);
     //let result = equations.par_iter().map(|equation| equation.solve(ops_map.get(&equation.op_space).unwrap())).sum();
-    let result = equations.iter().filter( |&e| {
+    let result = equations.par_iter().filter( |&e| {
         calculate_ops_early(&OPERATORS2, e)
     }).map(|e| e.result).sum();
     Some(result)
