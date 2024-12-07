@@ -2,7 +2,6 @@ advent_of_code::solution!(7);
 
 use std::fmt::format;
 
-use cached::proc_macro::cached;
 use itertools::Itertools;
 use rayon::prelude::*;
 
