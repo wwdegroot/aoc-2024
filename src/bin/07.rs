@@ -52,6 +52,11 @@ fn valid_result(instructions: &Vec<Vec<Operators>>, equation: &Equation) -> u64 
                 Operators::Multiply => ins_result * equation.numbers[i],
                 Operators::Combine => combine_number(ins_result, equation.numbers[i]),
             };
+            // already too big so early exit
+            if ins_result > equation.result {
+                break;
+            }
+
             i += 1
         }
         if ins_result == equation.result {
