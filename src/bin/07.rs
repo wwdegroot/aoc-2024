@@ -1,8 +1,7 @@
 advent_of_code::solution!(7);
 
-use std::fmt::format;
 
-use itertools::Itertools;
+use hashbrown::HashMap;
 use rayon::prelude::*;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
@@ -42,7 +41,7 @@ fn combine_number(left: u64, right: u64) -> u64 {
     combined.parse::<u64>().expect("A valid combined number")
 }
 
-fn valid_result(instructions: Vec<Vec<Operators>>, equation: &Equation) -> u64 {
+fn valid_result(instructions: &Vec<Vec<Operators>>, equation: &Equation) -> u64 {
     let mut valid_count = 0;
     for instruction in instructions {
         let mut ins_result = equation.numbers[0];
@@ -69,23 +68,21 @@ fn valid_result(instructions: Vec<Vec<Operators>>, equation: &Equation) -> u64 {
 }
 
 impl Equation {
-    fn solve(&self) -> u64 {
-        let ops = calculate_ops(&OPERATORS, self.op_space);
-
+    fn solve(&self, ops: &Vec<Vec<Operators>>) -> u64 {
         //println!("numbers= {:?} has {:?}", self.numbers, ops);
         valid_result(ops, &self)
     }
 
-    fn solve2(&self) -> u64 {
-        let ops = calculate_ops(&OPERATORS2, self.op_space);
+    fn solve2(&self, ops: &Vec<Vec<Operators>>) -> u64 {
 
         //println!("numbers= {:?} has {:?}", self.numbers, ops);
-        valid_result(ops, &self)
+        valid_result(&ops, &self)
     }
 }
 
-pub fn parse_input(input: &str) -> Vec<Equation> {
-    input
+pub fn parse_input(input: &str) -> (Vec<Equation>, usize) {
+    let mut max_op_space: usize = 0;
+    let equations = input
         .lines()
         .map(|l| {
             let (resultstr, numberstr) = l.split_once(": ").expect("Expected an eqution line");
@@ -97,24 +94,39 @@ pub fn parse_input(input: &str) -> Vec<Equation> {
                 .parse::<u64>()
                 .expect("A number before the : to parse.");
             let op_space = numbers.len() - 1;
+            if op_space > max_op_space {
+                max_op_space = op_space;
+            }
             Equation {
                 result,
                 numbers,
                 op_space,
             }
         })
-        .collect()
+        .collect();
+    (equations, max_op_space)
+}
+
+fn create_ops_permutations(max_ops_space: usize, operators: &[Operators]) -> HashMap<usize, Vec<Vec<Operators>>> {
+    let mut ops_map: HashMap<usize, Vec<Vec<Operators>>> = HashMap::new();
+    for i in 1..=max_ops_space {
+        ops_map.insert(i, calculate_ops(operators, i));
+    }
+    ops_map
+    
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let equations = parse_input(input);
-    let result = equations.par_iter().map(|equation| equation.solve()).sum();
+    let (equations, max_op_size) = parse_input(input);
+    let ops_map = create_ops_permutations(max_op_size, &OPERATORS);
+    let result = equations.par_iter().map(|equation| equation.solve(ops_map.get(&equation.op_space).unwrap())).sum();
     Some(result)
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let equations = parse_input(input);
-    let result = equations.par_iter().map(|equation| equation.solve2()).sum();
+    let (equations, max_op_size) = parse_input(input);
+    let ops_map = create_ops_permutations(max_op_size, &OPERATORS2);
+    let result = equations.par_iter().map(|equation| equation.solve2(ops_map.get(&equation.op_space).unwrap())).sum();
     Some(result)
 }
 
