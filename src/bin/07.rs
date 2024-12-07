@@ -3,6 +3,7 @@ advent_of_code::solution!(7);
 
 use hashbrown::HashMap;
 use itertools::Itertools;
+use cached::proc_macro::cached;
 use rayon::prelude::*;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
@@ -48,13 +49,14 @@ pub fn parse_input(input: &str) -> (Vec<Equation>, usize) {
     (equations, max_op_space)
 }
 
-fn calculate_ops(operators: &[Operators], length: usize) -> Vec<Vec<Operators>> {
+#[cached]
+fn calculate_ops(operators: Vec<Operators>, length: usize) -> Vec<Vec<Operators>> {
     if length == 1 {
         operators.iter().map(|&o| vec![o]).collect()
     } else {
         let mut permutations = Vec::new();
-        for op in operators {
-            for perm in calculate_ops(operators, length - 1) {
+        for op in &operators {
+            for perm in calculate_ops(operators.clone(), length - 1) {
                 let mut new_perm = vec![*op];
                 new_perm.extend(perm);
                 permutations.push(new_perm);
@@ -64,11 +66,9 @@ fn calculate_ops(operators: &[Operators], length: usize) -> Vec<Vec<Operators>> 
     }
 }
 
-
-
-
 fn combine_number(left: u64, right: u64) -> u64 {
     (left * next_power_of_10(right)) + right
+    // Not formatting a string gives 2x better performance
     //let combined = format!("{}{}", left, right);
     //combined.parse::<u64>().expect("A valid combined number")
 }
@@ -86,19 +86,17 @@ fn next_power_of_10(n: u64) -> u64 {
 
 fn verify_operations(instructions: &Vec<Operators>, equation: &Equation) -> u64 {
     let mut ins_result = equation.numbers[0];
-    let mut i = 1;
-    for operator in instructions {
+    for (i, operator) in instructions.iter().enumerate() {
         ins_result = match operator {
-            Operators::Add => ins_result + equation.numbers[i],
-            Operators::Multiply => ins_result * equation.numbers[i],
-            Operators::Combine => combine_number(ins_result, equation.numbers[i]),
+            Operators::Add => ins_result + equation.numbers[i + 1],
+            Operators::Multiply => ins_result * equation.numbers[i + 1],
+            Operators::Combine => combine_number(ins_result, equation.numbers[i + 1]),
         };
         // already too big so early exit
         if ins_result > equation.result {
             break;
         }
 
-        i += 1
     }
     if ins_result == equation.result {
         ins_result
@@ -128,10 +126,10 @@ impl Equation {
 
 
 // Creates map of all permutations for the Operators Enum
-fn create_ops_permutations(max_ops_space: usize, operators: &[Operators]) -> HashMap<usize, Vec<Vec<Operators>>> {
+fn create_ops_permutations(max_ops_space: usize, operators: Vec<Operators>) -> HashMap<usize, Vec<Vec<Operators>>> {
     let mut ops_map: HashMap<usize, Vec<Vec<Operators>>> = HashMap::new();
     for i in 1..=max_ops_space {
-        ops_map.insert(i, calculate_ops(operators, i));
+        ops_map.insert(i, calculate_ops(operators.clone(), i));
     }
     ops_map
     
@@ -139,6 +137,7 @@ fn create_ops_permutations(max_ops_space: usize, operators: &[Operators]) -> Has
 
 // Thanks to the example of https://github.com/nindalf/advent-2024/blob/master/src/day7/mod.rs#L43
 // Improved execution time from 450ms to 60 ms
+#[allow(dead_code)]
 fn calculate_ops_early(operators: &[Operators], equation: &Equation) -> bool {
     let mut intermediates: Vec<u64> = vec![equation.numbers[0]];
     let N: usize = operators.len();
@@ -168,21 +167,21 @@ fn calculate_ops_early(operators: &[Operators], equation: &Equation) -> bool {
 
 pub fn part_one(input: &str) -> Option<u64> {
     let (equations, max_op_size) = parse_input(input);
-    //let ops_map = create_ops_permutations(max_op_size, &OPERATORS);
-    //let result = equations.par_iter().map(|equation| equation.solve(ops_map.get(&equation.op_space).unwrap())).sum();
-    let result = equations.par_iter().filter( |&e| {
-        calculate_ops_early(&OPERATORS, e)
-    }).map(|e| e.result).sum();
+    let ops_map = create_ops_permutations(max_op_size, OPERATORS.to_vec());
+    let result = equations.par_iter().map(|equation| equation.solve(ops_map.get(&equation.op_space).unwrap())).sum();
+    // let result = equations.par_iter().filter( |&e| {
+    //     calculate_ops_early(&OPERATORS, e)
+    // }).map(|e| e.result).sum();
     Some(result)
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
     let (equations, max_op_size) = parse_input(input);
-    //let ops_map = create_ops_permutations(max_op_size, &OPERATORS2);
-    //let result = equations.par_iter().map(|equation| equation.solve(ops_map.get(&equation.op_space).unwrap())).sum();
-    let result = equations.par_iter().filter( |&e| {
-        calculate_ops_early(&OPERATORS2, e)
-    }).map(|e| e.result).sum();
+    let ops_map = create_ops_permutations(max_op_size, OPERATORS2.to_vec());
+    let result = equations.par_iter().map(|equation| equation.solve(ops_map.get(&equation.op_space).unwrap())).sum();
+    // let result = equations.par_iter().filter( |&e| {
+    //     calculate_ops_early(&OPERATORS2, e)
+    // }).map(|e| e.result).sum();
     Some(result)
 }
 
