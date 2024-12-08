@@ -51,10 +51,17 @@ fn calculate_all_antinodes(
     let mut antinodes = HashSet::new();
     let (col1, row1) = antenne1;
     let (col2, row2) = antenne2;
-
+    println!("Antenne1 = {:?}", antenne1);
+    println!("Antenne2 = {:?}", antenne2);
     for r in 0..row_max {
         for c in 0..col_max {
-            if (row1 * (col2 - r) + row2 * (r - col1) + c * (col1 - col2)).abs() == 0 {
+            // calculate the r (row) and c (col) position where the difference is zero, this is a valid antinode location
+            if (row1 * (col2 - r) + row2 * (r - col1) + c * (col1 - col2)) == 0 {
+                println!("grid loction row={}, col={}", r, c);
+                println!(
+                    "{} * ({} - {}) + {} * ({} - {}) + {} * ({} - {}) = 0",
+                    row1, col2, r, row2, r, col1, c, col1, col2
+                );
                 antinodes.insert((c, r));
             }
         }
@@ -136,5 +143,13 @@ mod tests {
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(34));
+    }
+
+    #[test]
+    fn test_part_two_example() {
+        let result = part_two(&advent_of_code::template::read_file_part(
+            "examples", DAY, 2,
+        ));
+        assert_eq!(result, Some(9));
     }
 }
