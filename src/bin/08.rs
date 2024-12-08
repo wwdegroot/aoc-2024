@@ -51,17 +51,17 @@ fn calculate_all_antinodes(
     let mut antinodes = HashSet::new();
     let (col1, row1) = antenne1;
     let (col2, row2) = antenne2;
-    println!("Antenne1 = {:?}", antenne1);
-    println!("Antenne2 = {:?}", antenne2);
+    // println!("Antenne1 = {:?}", antenne1);
+    // println!("Antenne2 = {:?}", antenne2);
     for r in 0..row_max {
         for c in 0..col_max {
             // calculate the r (row) and c (col) position where the difference is zero, this is a valid antinode location
             if (row1 * (col2 - r) + row2 * (r - col1) + c * (col1 - col2)) == 0 {
-                println!("grid loction row={}, col={}", r, c);
-                println!(
-                    "{} * ({} - {}) + {} * ({} - {}) + {} * ({} - {}) = 0",
-                    row1, col2, r, row2, r, col1, c, col1, col2
-                );
+                // println!("grid loction row={}, col={}", r, c);
+                // println!(
+                    // "{} * ({} - {}) + {} * ({} - {}) + {} * ({} - {}) = 0",
+                    // row1, col2, r, row2, r, col1, c, col1, col2
+                // );
                 antinodes.insert((c, r));
             }
         }
