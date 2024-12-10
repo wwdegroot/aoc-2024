@@ -8,4 +8,5 @@ INPUTS = {
     3: DATA_DIR / 'inputs' / '03.txt',
     4: DATA_DIR / 'inputs' / '04.txt',
     9: DATA_DIR / 'inputs' / '09.txt',
+    10: DATA_DIR / 'inputs' / '10.txt',
 }
