@@ -117,7 +117,7 @@ pub fn part_one(input: &str) -> Option<usize> {
     let grids = parse_input_grids(input);
     let regions = find_regions(grids);
     let result = calculate_fencing(regions);
-    println!("{:#?}", result);
+    // println!("{:#?}", result);
     Some(result)
 }
 
