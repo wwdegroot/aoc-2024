@@ -1,6 +1,7 @@
 from pathlib import Path
 
 DATA_DIR = Path(__file__).parent.parent.parent / 'data'
+OUTPUT_DIR = Path(__file__).parent / 'output'
 
 INPUTS = {
     1: DATA_DIR / 'inputs' / '01.txt',

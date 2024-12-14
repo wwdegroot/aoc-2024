@@ -1,5 +1,8 @@
 import math
 from dataclasses import dataclass
+from puzzles import OUTPUT_DIR
+from PIL import Image
+
 
 @dataclass
 class Coordinate:
@@ -98,8 +101,18 @@ def part_one(input: str) -> int:
 
 
 def part_two(input: str) -> int:
-    result = 0
-    return result
+    instructions = parse_input(input)
+    cycle = 103
+    iteration_target = 100 * cycle
+    base_image: Image = Image.new('RGB', (WIDTH, HEIGTH), color='white')
+    # repeating cycles of horizontal and vertical lines. Vertical repeat is every 103 iterations
+    for i in range(1, iteration_target, cycle):
+        step = calculate_final_positions(instructions, WIDTH, HEIGTH, iterations=i)
+        step_image = base_image.copy()
+        for x, y in step:
+            step_image.putpixel((x, y), (0, 0, 0))
+        step_image.save(OUTPUT_DIR / f"{i}.jpg")
+    return None
 
 
 def run(input: str, part: int) -> None:
