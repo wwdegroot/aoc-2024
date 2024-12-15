@@ -35,16 +35,17 @@ pub fn calculate_final_positions(
     iterations: i32
 ) -> Vec<Coordinate> {
     instructions.iter().map(|ins| {
+        // calculate_final_position(ins, width, heigth, iterations)
         Coordinate{
-            x: (ins.start.x + (ins.velocity.x * iterations)).rem_euclid(width),
-            y: (ins.start.y + (ins.velocity.y * iterations)).rem_euclid(heigth),
+            x: (ins.start.x + ins.velocity.x * iterations).rem_euclid(width),
+            y: (ins.start.y + ins.velocity.y * iterations).rem_euclid(heigth),
         }
     }).collect()
 }
 
 pub fn score_quadrants(width: i32, heigth: i32, positions: Vec<Coordinate>) -> u32 {
-    let middle_x = width.div_euclid(2);
-    let middle_y: i32 = heigth.div_euclid(2);
+    let middle_x = width / 2;
+    let middle_y: i32 = heigth / 2;
     let (mut tr, mut tl, mut br, mut bl) = (0, 0, 0, 0);
     for p in positions {
         if p.x < middle_x {
@@ -64,6 +65,7 @@ pub fn score_quadrants(width: i32, heigth: i32, positions: Vec<Coordinate>) -> u
             }
         }
     }
+    println!("{tr}, {tl}, {br}, {bl}");
     tr * tl * br * bl
 }
 
@@ -84,8 +86,10 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, Some(12));
+        let instructions = parse_input(&advent_of_code::template::read_file("examples", DAY));
+        let positions = calculate_final_positions(instructions, 11, 7, 100);
+        let result = score_quadrants(11, 7, positions);
+        assert_eq!(result, 12);
     }
 
     #[test]
