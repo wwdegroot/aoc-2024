@@ -95,36 +95,39 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(*result as u32)
 }
 
+pub fn shortest(memspace: &MemSpace) -> rustworkx_core::dictmap::DictMap<petgraph::graph::NodeIndex, usize> {
+    shortest_path::dijkstra(
+        &memspace.graph,
+        memspace.start,
+        Some(memspace.end),
+        |e| Ok::<usize, Infallible>(*e.weight()),
+        None,
+    )
+    .unwrap()
+}
+
 pub fn part_two(input: &str) -> Option<String> {
     let byte_drops = parse_input(input);
     let grid = Grid {
         width: 71,
         height: 71,
     };
-    let mut byte_drop_idx: usize = 1024;
-    
-    for i in byte_drop_idx..byte_drops.len() {
-        // let node_to_remove = memspace.nodes_indeces.get(&byte_drops[i]).unwrap();
-        // memspace.graph.remove_node(*node_to_remove);
-        let memspace = simulate_byte_drops(&byte_drops, i, &grid);
-        let solution: rustworkx_core::dictmap::DictMap<petgraph::graph::NodeIndex, usize> =
-        shortest_path::dijkstra(
-            &memspace.graph,
-            memspace.start,
-            Some(memspace.end),
-            |e| Ok::<usize, Infallible>(*e.weight()),
-            None,
-        )
-        .unwrap();
-        if let Some(_result) = solution.get_item(memspace.end) {
-            continue;
+    let mut left: usize = 0;
+    let mut right: usize = byte_drops.len() - 1;
+
+    while left < right {
+        let mid = (left + right) / 2;
+        let memspace = simulate_byte_drops(&byte_drops, mid, &grid);
+        let solution = shortest(&memspace);
+        let result = solution.get_item(memspace.end);
+        if result.is_some() {
+            left = mid + 1;
         } else {
-            // no longer a path to the exit
-            byte_drop_idx = i -1;
-            break;
+            right = mid;
         }
     }
-    let result = byte_drops[byte_drop_idx];
+
+    let result = byte_drops[right -1];
 
     Some(format!("{},{}", result.0, result.1))
 }
