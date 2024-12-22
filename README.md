@@ -27,8 +27,9 @@ Solutions for [Python with benchmarks](./python/README.md)
 | [Day 17](./src/bin/17.rs) | `2.2µs` | `-` |
 | [Day 18](./src/bin/18.rs) | `1.2ms` | `3.8ms` |
 | [Day 19](./src/bin/19.rs) | `7.9ms` | `45.7ms` |
+| [Day 22](./src/bin/22.rs) | `1.6ms` | `550.4ms` |
 
-**Total: 277.11ms**
+**Total: 829.11ms**
 <!--- benchmarking table --->
 
 ---
